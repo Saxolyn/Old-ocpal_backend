@@ -74,7 +74,7 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
                     accountRepository.updateByPassword(account.get().getId(), restorePassword);
                    return BaseResponse.builder().status(SUCCESS).message(MI0005).build();
                 case HIEU_TECHLEAD:
-                case STUDENT:
+                case LUONG_TECHLEAD:
                     return BaseResponse.builder().status(SUCCESS).message(MI0004).build();
                 default:
                     return BaseResponse.builder().status(BAD_REQUEST).message(MI0004).build();

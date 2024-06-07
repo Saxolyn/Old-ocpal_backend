@@ -1,5 +1,6 @@
 package dev9.lapco.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev9.lapco.constant.ERole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class AccountEntity extends BaseEntity {
 
     private String username;
 
+    @JsonIgnore
     private String password;
 
     private ERole role;

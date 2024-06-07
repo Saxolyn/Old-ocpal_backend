@@ -2,7 +2,7 @@ package dev9.lapco.constant;
 
 public interface StatusCode {
 
-    static String OK = "200";
+    static String SUCCESS = "200";
 
     static String CREATED = "201";
 

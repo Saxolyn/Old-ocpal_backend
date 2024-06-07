@@ -1,6 +1,6 @@
 package dev9.lapco.controller;
 
-import dev9.lapco.dto.StudentDTO;
+import dev9.lapco.request.CreatedStudentRequest;
 import dev9.lapco.response.StudentResponse;
 import dev9.lapco.service.StudentService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +16,7 @@ public class StudentController {
     private final StudentService studentService;
 
     @PostMapping("add-student")
-    public StudentResponse addStudent(StudentDTO studentDTO, HttpServletRequest request){
+    public StudentResponse addStudent(CreatedStudentRequest studentDTO, HttpServletRequest request){
                 return studentService.insert(studentDTO, request);
     }
 }

@@ -1,8 +1,10 @@
 package dev9.lapco.config.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import dev9.lapco.constant.ERole;
 import dev9.lapco.entity.AccountEntity;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Getter
+@Setter
 public class UserDetailsImpl implements UserDetails {
 
     @Serial
@@ -27,25 +30,28 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password;
 
+    private ERole role;
+
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(String id, String phoneNumber, String adUsername, String password,
+    public UserDetailsImpl(String id, String phoneNumber, String adUsername, String password, ERole roles,
                            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.phoneNumber = phoneNumber;
         this.adUsername = adUsername;
         this.password = password;
+        this.role = roles;
         this.authorities = authorities;
     }
 
-    public static UserDetailsImpl build(AccountEntity account) {
-        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(account.getRole().toString()));
-        return new UserDetailsImpl(
+    public static UserDetailsImpl build(AccountEntity account, ERole roles, List<SimpleGrantedAuthority> authorities) {
+                return new UserDetailsImpl(
                 account.getId(),
                 account.getUsername(),
                 account.getPhoneNumber(),
                 account.getPassword(),
-                authorities);
+                        roles,
+                        authorities);
     }
 
     @Override
@@ -92,4 +98,7 @@ public class UserDetailsImpl implements UserDetails {
         UserDetailsImpl user = (UserDetailsImpl) o;
         return Objects.equals(id, user.id);
     }
+
+
+
 }

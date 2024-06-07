@@ -5,7 +5,6 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -22,15 +21,6 @@ public class BaseResponse {
 
     private String path;
 
-    /*
-    false là thành công, true là lỗi
-     */
-    private Boolean errorCode;
-
-//    BaseResponse() {
-//        this.timestamp = LapcoUtil.localDateTimeToString(LocalDateTime.now());
-//    }
-
-
-
+    @Builder.Default
+    private Boolean errorCode = false;
 }

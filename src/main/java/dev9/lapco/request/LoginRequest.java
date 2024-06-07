@@ -1,4 +1,4 @@
-package dev9.lapco.dto;
+package dev9.lapco.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountDTO {
+public class LoginRequest {
 
     private String phoneNumber;
     private String password;

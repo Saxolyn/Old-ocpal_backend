@@ -1,13 +1,17 @@
 package dev9.lapco.service;
 
-import dev9.lapco.dto.AccountDTO;
+import dev9.lapco.request.ChangPasswordRequest;
+import dev9.lapco.request.LoginRequest;
+import dev9.lapco.request.RestorePasswordRequest;
+import dev9.lapco.response.BaseResponse;
 import dev9.lapco.response.LoginResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
 public interface AccountService {
 
-    LoginResponse login(AccountDTO account);
+    LoginResponse login(LoginRequest account);
 
-    LoginResponse loginByAdmin(String username, String password);
+    BaseResponse restorePassword(RestorePasswordRequest request);
 
-
+    BaseResponse changPassword(ChangPasswordRequest request, HttpServletRequest httpRequest);
 }

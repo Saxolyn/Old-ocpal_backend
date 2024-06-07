@@ -1,12 +1,17 @@
 package dev9.lapco.controller;
 
-import dev9.lapco.config.jwt.JwtUtils;
+import dev9.lapco.constant.Authority;
 import dev9.lapco.constant.StatusCode;
-import dev9.lapco.dto.AccountDTO;
+import dev9.lapco.request.ChangPasswordRequest;
+import dev9.lapco.request.LoginRequest;
+import dev9.lapco.request.RestorePasswordRequest;
+import dev9.lapco.response.BaseResponse;
 import dev9.lapco.response.LoginResponse;
 import dev9.lapco.service.AccountService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,37 +22,23 @@ public class AccountController implements dev9.lapco.constant.Message, StatusCod
 
     private final AccountService accountService;
 
-    private final AuthenticationManager authenticationManager;
-
-    private final JwtUtils jwtUtils;
-
+    private final Authority authority;
 
     @PostMapping("/login")
-    private LoginResponse login(@RequestBody AccountDTO account) {
-
-
-//        LoginResponse loginResponse = accountService.login(account);
-
-//        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-//                .body(new LoginResponse(userDetails.getId(),
-//                        userDetails.getUsername(),
-//                        userDetails.getEmail(),
-//                        roles));
+    private LoginResponse login(@RequestBody LoginRequest account) {
         return accountService.login(account);
-
-//        return accountService.login(account.getUsername(), account.getPassword());
     }
 
-//    @PostMapping("/Administrator")
-//    private LoginResponse loginByAdmin(@RequestBody Account account) {
-//        return accountService.loginByAdmin(account.getUsername(), account.getPassword());
-//    }
+    @PostMapping("/restore-password")
+    private BaseResponse restorePassword (RestorePasswordRequest request){
+        return accountService.restorePassword(request);
+    }
 
-//    @PostMapping("/validate")
-//    private LoginResponse validate(@RequestBody Account account) {
-//        return null;
-//    }
-
+    @PostMapping("/chang-password")
+    @PreAuthorize("hasAuthority(authority.UPDATE_PASSWORD_AUTH_02_LEVEL)")
+    private BaseResponse changePassword (ChangPasswordRequest request, HttpServletRequest httpRequest){
+        return accountService.changPassword(request,httpRequest);
+    }
 
 
 }

@@ -3,7 +3,7 @@ package dev9.lapco.service.serviceImpl;
 import dev9.lapco.config.jwt.JwtUtils;
 import dev9.lapco.constant.ERole;
 import dev9.lapco.constant.StatusCode;
-import dev9.lapco.dto.StudentDTO;
+import dev9.lapco.request.CreatedStudentRequest;
 import dev9.lapco.entity.AccountEntity;
 import dev9.lapco.entity.StudentEntity;
 import dev9.lapco.repository.AccountRepository;
@@ -29,9 +29,9 @@ public class StudentServiceImpl implements StudentService, StatusCode {
 
 
     @Override
-    public StudentResponse insert(StudentDTO studentDTO, HttpServletRequest request) {
+    public StudentResponse insert(CreatedStudentRequest studentDTO, HttpServletRequest request) {
 
-        if(jwtUtils.getUsernameFromRequest(request).isEmpty()){
+        if(jwtUtils.getPhoneNumberFromRequest(request).isEmpty()){
             return StudentResponse.builder().status(UNAUTHORIZED).build();
         }
 
@@ -41,11 +41,11 @@ public class StudentServiceImpl implements StudentService, StatusCode {
         accountRepository.save(convertStudentDTOToAccountEntity(studentDTO)) ;
 
 
-        return StudentResponse.builder().status(OK).build();
+        return StudentResponse.builder().status(SUCCESS).build();
     }
 
 
-    private StudentEntity convertStudentDTOToStudentEntity(StudentDTO studentDTO) {
+    private StudentEntity convertStudentDTOToStudentEntity(CreatedStudentRequest studentDTO) {
         return StudentEntity.builder()
                 .firstName(studentDTO.getFirstName())
                 .lastName(studentDTO.getLastName())
@@ -57,7 +57,7 @@ public class StudentServiceImpl implements StudentService, StatusCode {
                 .build();
     }
 
-    private AccountEntity convertStudentDTOToAccountEntity(StudentDTO studentDTO) {
+    private AccountEntity convertStudentDTOToAccountEntity(CreatedStudentRequest studentDTO) {
         return AccountEntity.builder()
                 .username(studentDTO.getUsername())
                 .phoneNumber(studentDTO.getPhoneNumber())

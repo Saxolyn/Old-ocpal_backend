@@ -1,4 +1,4 @@
-package dev9.lapco.dto;
+package dev9.lapco.request;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class StudentDTO {
+public class CreatedStudentRequest {
 
     private String firstName;
 

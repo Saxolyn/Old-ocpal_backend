@@ -1,8 +1,12 @@
 package dev9.lapco.constant;
 
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class Authority {
 
     public final static String AUTH_02_LEVEL = "Authenticate by OTP";
@@ -155,7 +159,7 @@ public class Authority {
         );
     }
 
-    public List<String> getAdminAuthority() {
+    public static List<String> getAdminAuthority() {
         return List.of(
                 AUTH_02_LEVEL,
                 UPDATE_PASSWORD,
@@ -202,7 +206,7 @@ public class Authority {
                 );
     }
 
-    public List<String> getTeacherAuthority() {
+    public static List<String> getTeacherAuthority() {
         return List.of(
                 READ_SCHEDULE,
                 READ_LESSION_LIST,
@@ -216,7 +220,7 @@ public class Authority {
         );
     }
 
-    public List<String> getStudentAuthority() {
+    public static List<String> getStudentAuthority() {
         return List.of(WRITE_TEST);
     }
 

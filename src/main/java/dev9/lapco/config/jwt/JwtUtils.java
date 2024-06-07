@@ -2,19 +2,12 @@ package dev9.lapco.config.jwt;
 
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
-import dev9.lapco.config.security.UserDetailsImpl;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.WebUtils;
 
 import java.io.Serializable;
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -83,7 +76,7 @@ public class JwtUtils implements Serializable {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    public String getUsernameFromRequest(HttpServletRequest request) {
+    public String getPhoneNumberFromRequest(HttpServletRequest request) {
         String requestHeader = request.getHeader("Authorization");
         String token = requestHeader.substring(7);
         return getUsernameFromToken(token);

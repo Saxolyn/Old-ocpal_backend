@@ -73,7 +73,7 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
                     String restorePassword = passwordEncoder.encode(defaultPassword);
                     accountRepository.updateByPassword(account.get().getId(), restorePassword);
                    return BaseResponse.builder().status(SUCCESS).message(MI0005).build();
-                case HIEU_TECHLEAD:
+                case TEACHER:
                 case STUDENT:
                     return BaseResponse.builder().status(SUCCESS).message(MI0004).build();
                 default:

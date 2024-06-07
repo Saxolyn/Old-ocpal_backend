@@ -1,13 +1,14 @@
 package dev9.lapco.service.serviceImpl;
 
+import dev9.lapco.commonUtil.ValidateUtil;
 import dev9.lapco.config.jwt.JwtUtils;
 import dev9.lapco.config.security.UserDetailsImpl;
 import dev9.lapco.constant.Message;
 import dev9.lapco.constant.StatusCode;
-import dev9.lapco.request.ChangPasswordRequest;
-import dev9.lapco.request.LoginRequest;
 import dev9.lapco.entity.AccountEntity;
 import dev9.lapco.repository.AccountRepository;
+import dev9.lapco.request.ChangPasswordRequest;
+import dev9.lapco.request.LoginRequest;
 import dev9.lapco.request.RestorePasswordRequest;
 import dev9.lapco.response.BaseResponse;
 import dev9.lapco.response.LoginResponse;
@@ -20,12 +21,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService, StatusCode, Message {
@@ -34,14 +33,14 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
 
     private final AuthenticationManager authenticationManager;
 
-    private final UserDetailsService userDetailsService;
-
     private final JwtUtils jwtUtils;
 
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${Application.defaulPassword}")
+    @Value("${Application.defaultPassword}")
     private String defaultPassword;
+
+
 
     @Override
     public LoginResponse login(LoginRequest account) {
@@ -84,11 +83,17 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
     }
 
     @Override
-    public BaseResponse changPassword(ChangPasswordRequest request, HttpServletRequest httpRequest) {
+    public BaseResponse changePassword(ChangPasswordRequest request, HttpServletRequest httpRequest) {
         String phoneNumberFromRequest = jwtUtils.getPhoneNumberFromRequest(httpRequest);
         Optional<AccountEntity> account = accountRepository.findAccount(phoneNumberFromRequest);
+        if(account.isEmpty()) {
+            return BaseResponse.builder().status(NOT_FOUND).message(ME0004).build();
+        }
 
-
-        return null;
+        if(!ValidateUtil.isValidPassword(request.getOldPassword(),request.getNewPassword(), request.getConfirmPassword())){
+            return BaseResponse.builder().status(BAD_REQUEST).message(MI0004).build();
+        }
+        accountRepository.updateByPassword(account.get().getId(), passwordEncoder.encode(request.getNewPassword()));
+        return BaseResponse.builder().status(SUCCESS).message(MI0005).build();
     }
 }

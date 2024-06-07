@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class LapcoApplication {
+public class OcpalApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(LapcoApplication.class, args);
+		SpringApplication.run(OcpalApplication.class, args);
 	}
 
 }

@@ -35,6 +35,22 @@ public class ValidateUtil implements Pattern {
         return matcher.matches();
     }
 
+    public static boolean isValidPassword(String oldPassword, String newPassword, String confirmPassword) {
+        if (Strings.isBlank(newPassword) || Strings.isBlank(oldPassword) || Strings.isBlank(confirmPassword)) {
+            return false;
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            return false;
+        }
+
+        if (!isValidPassword(newPassword)) {
+            return false;
+        }
+
+        return !oldPassword.equals(newPassword);
+    }
+
     public static boolean isValidIdentityCard(String identityCard) {
         if (Strings.isEmpty(identityCard) || Strings.isBlank(identityCard)) {
             return false;
@@ -43,4 +59,6 @@ public class ValidateUtil implements Pattern {
         Matcher matcher = pattern.matcher(identityCard);
         return matcher.matches();
     }
+
+
 }

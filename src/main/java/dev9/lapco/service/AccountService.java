@@ -6,6 +6,7 @@ import dev9.lapco.request.RestorePasswordRequest;
 import dev9.lapco.response.BaseResponse;
 import dev9.lapco.response.LoginResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Service;
 
 public interface AccountService {
 
@@ -13,5 +14,5 @@ public interface AccountService {
 
     BaseResponse restorePassword(RestorePasswordRequest request);
 
-    BaseResponse changPassword(ChangPasswordRequest request, HttpServletRequest httpRequest);
+    BaseResponse changePassword(ChangPasswordRequest request, HttpServletRequest httpRequest);
 }

@@ -33,7 +33,7 @@ public class AccountController implements Message, StatusCode {
     }
 
     @PutMapping("/change-password")
-    @PreAuthorize("hasAuthority(authority.UPDATE_PASSWORD_AUTH_02_LEVEL)")
+//    @PreAuthorize("hasAuthority(authority.UPDATE_PASSWORD_AUTH_02_LEVEL)")
     private BaseResponse changePassword(ChangPasswordRequest request, HttpServletRequest httpRequest) {
         return accountService.changePassword(request, httpRequest);
     }

@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -21,10 +23,12 @@ public class BaseEntity {
 
     private String createdUser;
 
-    private LocalDateTime createdDate = LocalDateTime.now();
+    @CreatedDate
+    private LocalDateTime createdDate;
 
     private String updatedUser;
 
-    private LocalDateTime updatedDate =  LocalDateTime.now();;
+    @LastModifiedDate
+    private LocalDateTime updatedDate;
 
 }

@@ -25,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService, StatusCode, Message {
@@ -40,8 +41,6 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
     @Value("${Application.defaultPassword}")
     private String defaultPassword;
 
-
-
     @Override
     public LoginResponse login(LoginRequest account) {
         try {
@@ -51,6 +50,7 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             String jwtToken = jwtUtils.generateToken(userDetails);
+
             AccountEntity accountEntity = new AccountEntity();
             accountEntity.setPhoneNumber(account.getPhoneNumber());
             accountEntity.setRole(userDetails.getRole());
@@ -66,26 +66,25 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
         if (account.isEmpty()) {
             return BaseResponse.builder().status(NOT_FOUND).message(MI0002).build();
         }
-            switch (account.get().getRole()) {
-                case SUPER_ADMIN:
-                case ADMIN:
-                    String restorePassword = passwordEncoder.encode(defaultPassword);
-                    accountRepository.updateByPassword(account.get().getId(), restorePassword);
-                   return BaseResponse.builder().status(SUCCESS).message(MI0005).build();
-                case TEACHER:
-                case STUDENT:
-                    return BaseResponse.builder().status(SUCCESS).message(MI0004).build();
-                default:
-                    return BaseResponse.builder().status(BAD_REQUEST).message(MI0004).build();
-            }
+        switch (account.get().getRole()) {
+            case SUPER_ADMIN:
+            case ADMIN:
+                account.get().setPassword(passwordEncoder.encode(defaultPassword));
+                accountRepository.save(account.get());
+                return BaseResponse.builder().status(SUCCESS).message(MI0005).build();
+            case TEACHER:
+            case STUDENT:
+                return BaseResponse.builder().status(SUCCESS).message(MI0004).build();
+            default:
+                return BaseResponse.builder().status(BAD_REQUEST).message(MI0004).build();
+        }
 
 
     }
 
     @Override
     public BaseResponse changePassword(ChangPasswordRequest request, HttpServletRequest httpRequest) {
-        String phoneNumberFromRequest = jwtUtils.getPhoneNumberFromRequest(httpRequest);
-        Optional<AccountEntity> account = accountRepository.findAccount(phoneNumberFromRequest);
+        Optional<AccountEntity> account = accountRepository.findAccount(jwtUtils.getPhoneNumberFromRequest(httpRequest));
         if(account.isEmpty()) {
             return BaseResponse.builder().status(NOT_FOUND).message(ME0004).build();
         }
@@ -93,7 +92,8 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
         if(!ValidateUtil.isValidPassword(request.getOldPassword(),request.getNewPassword(), request.getConfirmPassword())){
             return BaseResponse.builder().status(BAD_REQUEST).message(MI0004).build();
         }
-        accountRepository.updateByPassword(account.get().getId(), passwordEncoder.encode(request.getNewPassword()));
-        return BaseResponse.builder().status(SUCCESS).message(MI0005).build();
+        account.get().setPassword(passwordEncoder.encode(request.getNewPassword()));
+        accountRepository.save(account.get());
+        return BaseResponse.builder().status(SUCCESS).message(MI0006).build();
     }
 }

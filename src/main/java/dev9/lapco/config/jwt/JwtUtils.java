@@ -1,5 +1,6 @@
 package dev9.lapco.config.jwt;
 
+import dev9.lapco.config.security.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,9 +53,9 @@ public class JwtUtils implements Serializable {
     }
 
     // generate token for user
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetailsImpl userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername());
+        return doGenerateToken(claims, userDetails.getPhoneNumber());
     }
 
     // while creating the token -

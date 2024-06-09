@@ -14,6 +14,8 @@ public interface Message {
 
     static final String MI0005 = "Your password is restored successfully to [lapco], you should change your password after login to secure your account";
 
+    static final String MI0006 = "Password changed successfully";
+
     static final String ME0003 = "Unauthorized error: {}";
 
     static final String ME0004 = "Error: Unauthorized";

@@ -45,13 +45,13 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public static UserDetailsImpl build(AccountEntity account, ERole roles, List<SimpleGrantedAuthority> authorities) {
-                return new UserDetailsImpl(
+        return new UserDetailsImpl(
                 account.getId(),
-                account.getUsername(),
                 account.getPhoneNumber(),
+                account.getUsername(),
                 account.getPassword(),
-                        roles,
-                        authorities);
+                roles,
+                authorities);
     }
 
     @Override
@@ -98,7 +98,6 @@ public class UserDetailsImpl implements UserDetails {
         UserDetailsImpl user = (UserDetailsImpl) o;
         return Objects.equals(id, user.id);
     }
-
 
 
 }

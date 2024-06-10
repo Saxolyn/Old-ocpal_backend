@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class StudentResponse extends BaseResponse {
+public class CreatedUserResponse extends BaseResponse {
 
     private String username;
 

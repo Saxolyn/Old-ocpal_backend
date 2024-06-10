@@ -8,7 +8,6 @@ import dev9.lapco.request.RestorePasswordRequest;
 import dev9.lapco.response.BaseResponse;
 import dev9.lapco.response.LoginResponse;
 import dev9.lapco.service.AccountService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,8 +33,8 @@ public class AccountController implements Message, StatusCode {
 
     @PutMapping("/change-password")
 //    @PreAuthorize("hasAuthority(authority.UPDATE_PASSWORD_AUTH_02_LEVEL)")
-    private BaseResponse changePassword(ChangPasswordRequest request, HttpServletRequest httpRequest) {
-        return accountService.changePassword(request, httpRequest);
+    private BaseResponse changePassword(@RequestBody ChangPasswordRequest request) {
+        return accountService.changePassword(request);
     }
 
 

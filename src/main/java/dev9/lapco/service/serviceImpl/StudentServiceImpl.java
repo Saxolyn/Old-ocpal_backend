@@ -1,68 +1,98 @@
 package dev9.lapco.service.serviceImpl;
 
-import dev9.lapco.config.jwt.JwtUtils;
+import dev9.lapco.commonUtil.ConvertedUtil;
+import dev9.lapco.commonUtil.ValidateUtil;
+import dev9.lapco.config.security.UserDetailsImpl;
 import dev9.lapco.constant.ERole;
+import dev9.lapco.constant.Message;
 import dev9.lapco.constant.StatusCode;
-import dev9.lapco.request.CreatedStudentRequest;
 import dev9.lapco.entity.AccountEntity;
+import dev9.lapco.entity.AdminEntity;
 import dev9.lapco.entity.StudentEntity;
+import dev9.lapco.entity.TeacherEntity;
 import dev9.lapco.repository.AccountRepository;
+import dev9.lapco.repository.AdminRepository;
 import dev9.lapco.repository.StudentRepository;
-import dev9.lapco.response.StudentResponse;
-import dev9.lapco.service.StudentService;
-import jakarta.servlet.http.HttpServletRequest;
+import dev9.lapco.repository.TeacherRepository;
+import dev9.lapco.request.CreatedUserRequest;
+import dev9.lapco.response.CreatedUserResponse;
+import dev9.lapco.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
-public class StudentServiceImpl implements StudentService, StatusCode {
-
-    private final PasswordEncoder passwordEncoder;
+public class StudentServiceImpl implements UserService, StatusCode, Message {
 
     private final StudentRepository studentRepository;
 
+    private final TeacherRepository teacherRepository;
+
+    private final AdminRepository adminRepository;
+
     private final AccountRepository accountRepository;
 
-    private final JwtUtils jwtUtils;
+    private final PasswordEncoder passwordEncoder;
 
+    private final ConvertedUtil convertedUtil;
 
     @Override
-    public StudentResponse insert(CreatedStudentRequest studentDTO, HttpServletRequest request) {
+    public CreatedUserResponse createdNew(CreatedUserRequest createdUserRequest) {
 
-        if(jwtUtils.getPhoneNumberFromRequest(request).isEmpty()){
-            return StudentResponse.builder().status(UNAUTHORIZED).build();
+        UserDetailsImpl loggedUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (loggedUser == null) {
+            return CreatedUserResponse.builder().status(UNAUTHORIZED).message(ME0002).build();
         }
 
+        Optional<AccountEntity> checkAccount = accountRepository.findAccount(createdUserRequest.getPhoneNumber());
+        if (checkAccount.isPresent()) {
+            return CreatedUserResponse.builder().status(BAD_REQUEST).message(ME0005).errorCode(false).build();
+        }
 
-        //save student to account collection
-        studentDTO.setIdentityNumber(passwordEncoder.encode(studentDTO.getIdentityNumber()));
-        accountRepository.save(convertStudentDTOToAccountEntity(studentDTO)) ;
+        if (!ValidateUtil.isValidIdentityCard(createdUserRequest.getIdentityNumber()) || !ValidateUtil.isValidPhoneNumber(createdUserRequest.getPhoneNumber())) {
+            return CreatedUserResponse.builder().status(BAD_REQUEST).message(ME0006).errorCode(false).build();
+        } else {
+            if (createdUserRequest.getRole() == null) {
+                createdUserRequest.setRole(ERole.STUDENT);
+            }
+            try {
+                switch (createdUserRequest.getRole()) {
+                    case ADMIN:
+                        AdminEntity newAdmin = (AdminEntity) convertedUtil.convertNewUserRequestToStudentEntity(createdUserRequest);
+                        adminRepository.save(newAdmin);
+                        break;
+                    case TEACHER:
+                        TeacherEntity newTeacher = (TeacherEntity) convertedUtil.convertNewUserRequestToStudentEntity(createdUserRequest);
+                        teacherRepository.save(newTeacher);
+                        break;
+                    case STUDENT:
+                        StudentEntity newStudent = (StudentEntity) convertedUtil.convertNewUserRequestToStudentEntity(createdUserRequest);
+                        studentRepository.save(newStudent);
+                        break;
+                    default:
+                }
+                createdUserRequest.setIdentityNumber(passwordEncoder.encode(createdUserRequest.getIdentityNumber()));
+                AccountEntity newAccount = convertedUtil.convertToAccountEntity(createdUserRequest);
+                accountRepository.save(newAccount);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return CreatedUserResponse.builder().status(BAD_REQUEST).message(MF0001).errorCode(true).build();
+            }
 
-
-        return StudentResponse.builder().status(SUCCESS).build();
-    }
-
-
-    private StudentEntity convertStudentDTOToStudentEntity(CreatedStudentRequest studentDTO) {
-        return StudentEntity.builder()
-                .firstName(studentDTO.getFirstName())
-                .lastName(studentDTO.getLastName())
-                .username(studentDTO.getUsername())
-                .address(studentDTO.getAddress())
-                .email(studentDTO.getEmail())
-                .phoneNumber(studentDTO.getPhoneNumber())
-                //Todo : chưa convert đủ trường
+        }
+        return CreatedUserResponse.builder()
+                .status(SUCCESS)
+                .message(MI0004)
+                .phoneNumber(createdUserRequest.getPhoneNumber())
+                .username(createdUserRequest.getUsername())
+                .role(createdUserRequest.getRole())
                 .build();
     }
 
-    private AccountEntity convertStudentDTOToAccountEntity(CreatedStudentRequest studentDTO) {
-        return AccountEntity.builder()
-                .username(studentDTO.getUsername())
-                .phoneNumber(studentDTO.getPhoneNumber())
-                .password(studentDTO.getIdentityNumber())
-                .role(ERole.STUDENT)
-                .build();
-    }
+
 }

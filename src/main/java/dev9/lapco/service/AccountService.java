@@ -5,7 +5,6 @@ import dev9.lapco.request.LoginRequest;
 import dev9.lapco.request.RestorePasswordRequest;
 import dev9.lapco.response.BaseResponse;
 import dev9.lapco.response.LoginResponse;
-import jakarta.servlet.http.HttpServletRequest;
 
 public interface AccountService {
 
@@ -13,5 +12,5 @@ public interface AccountService {
 
     BaseResponse restorePassword(RestorePasswordRequest request);
 
-    BaseResponse changePassword(ChangPasswordRequest request, HttpServletRequest httpRequest);
+    BaseResponse changePassword(ChangPasswordRequest request);
 }

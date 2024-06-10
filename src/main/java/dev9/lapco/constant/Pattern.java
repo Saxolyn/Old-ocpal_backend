@@ -8,9 +8,9 @@ public interface Pattern {
 
     static String STUDENT_CODE_PATTERN = "^\\.\\d{2}\\.\\d{6}$";
 
-    static String PHONE_NUMBER_PATTERN = "^0\\d{10}$";
+    static String PHONE_NUMBER_PATTERN = "^0\\d{9}$";
 
-    static String IDENTITY_CARD_PATTERN = "^\\d{9}|\\d{12}$";
+    static String IDENTITY_CARD_PATTERN = "^\\d{12}$";
 
     static String DATE_TIME_PATTERN = "yyyy/MM/dd HH:mm:ss";
 }

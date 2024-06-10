@@ -77,10 +77,4 @@ public class JwtUtils implements Serializable {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    public String getPhoneNumberFromRequest(HttpServletRequest request) {
-        String requestHeader = request.getHeader("Authorization");
-        String token = requestHeader.substring(7);
-        return getUsernameFromToken(token);
-
-    }
 }

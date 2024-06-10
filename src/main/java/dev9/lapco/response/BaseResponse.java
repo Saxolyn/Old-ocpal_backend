@@ -1,6 +1,6 @@
 package dev9.lapco.response;
 
-import dev9.lapco.commonUtil.LapcoUtil;
+import dev9.lapco.commonUtil.OcpalUtil;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -17,7 +17,7 @@ public class BaseResponse {
     private String message;
 
     @Builder.Default
-    private String timestamp = LapcoUtil.localDateTimeToString(LocalDateTime.now());
+    private String timestamp = OcpalUtil.localDateTimeToString(LocalDateTime.now());
 
     private String path;
 

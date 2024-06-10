@@ -6,7 +6,6 @@ import dev9.lapco.constant.Message;
 import dev9.lapco.entity.AccountEntity;
 import dev9.lapco.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,7 +13,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,7 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, Message {
     @Transactional
     public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {
         AccountEntity account = accountRepository.findAccount(phoneNumber).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + phoneNumber));
-        List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
+        List<SimpleGrantedAuthority> grantedAuthorities;
         ERole roles = account.getRole();
         switch (roles){
             case SUPER_ADMIN:
@@ -47,7 +45,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, Message {
                 grantedAuthorities = studentAuthorityList.stream().map(SimpleGrantedAuthority::new).toList();
                 break;
             default:
-                throw new UsernameNotFoundException(ME0005 + account.getUsername() + phoneNumber);
+                throw new UsernameNotFoundException(ME0003 + account.getUsername() + phoneNumber);
         }
 
         return UserDetailsImpl.build(account,roles, grantedAuthorities);

@@ -31,4 +31,6 @@ public class BaseEntity {
     @LastModifiedDate
     private LocalDateTime updatedDate;
 
+    private Boolean isDeleted = false;
+
 }

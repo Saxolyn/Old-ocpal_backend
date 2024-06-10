@@ -13,7 +13,6 @@ import dev9.lapco.request.RestorePasswordRequest;
 import dev9.lapco.response.BaseResponse;
 import dev9.lapco.response.LoginResponse;
 import dev9.lapco.service.AccountService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -56,7 +55,7 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
             accountEntity.setRole(userDetails.getRole());
             return LoginResponse.builder().status(SUCCESS).errorCode(false).account(accountEntity).token(jwtToken).build();
         } catch (Exception e) {
-            throw new BadCredentialsException(ME0006, new Throwable(e.getMessage()));
+            throw new BadCredentialsException(ME0004, new Throwable(e.getMessage()));
         }
     }
 
@@ -64,36 +63,38 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
     public BaseResponse restorePassword(RestorePasswordRequest request) {
         Optional<AccountEntity> account = accountRepository.findAccount(request.getPhoneNumber());
         if (account.isEmpty()) {
-            return BaseResponse.builder().status(NOT_FOUND).message(MI0002).build();
+            return BaseResponse.builder().status(NOT_FOUND).message(ME0007).build();
         }
         switch (account.get().getRole()) {
             case SUPER_ADMIN:
             case ADMIN:
                 account.get().setPassword(passwordEncoder.encode(defaultPassword));
                 accountRepository.save(account.get());
-                return BaseResponse.builder().status(SUCCESS).message(MI0005).build();
+                return BaseResponse.builder().status(SUCCESS).message(MI0002).build();
             case TEACHER:
             case STUDENT:
-                return BaseResponse.builder().status(SUCCESS).message(MI0004).build();
+                return BaseResponse.builder().status(SUCCESS).message(ME0009).build();
             default:
-                return BaseResponse.builder().status(BAD_REQUEST).message(MI0004).build();
+                return BaseResponse.builder().status(BAD_REQUEST).message(ME0009).build();
         }
 
 
     }
 
     @Override
-    public BaseResponse changePassword(ChangPasswordRequest request, HttpServletRequest httpRequest) {
-        Optional<AccountEntity> account = accountRepository.findAccount(jwtUtils.getPhoneNumberFromRequest(httpRequest));
+    public BaseResponse changePassword(ChangPasswordRequest request) {
+        UserDetailsImpl loggedUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<AccountEntity> account = accountRepository.findAccount(loggedUser.getPhoneNumber());
         if(account.isEmpty()) {
-            return BaseResponse.builder().status(NOT_FOUND).message(ME0004).build();
+            return BaseResponse.builder().status(NOT_FOUND).message(ME0002).build();
         }
 
         if(!ValidateUtil.isValidPassword(request.getOldPassword(),request.getNewPassword(), request.getConfirmPassword())){
-            return BaseResponse.builder().status(BAD_REQUEST).message(MI0004).build();
+            return BaseResponse.builder().status(BAD_REQUEST).message(ME0009).build();
         }
         account.get().setPassword(passwordEncoder.encode(request.getNewPassword()));
         accountRepository.save(account.get());
-        return BaseResponse.builder().status(SUCCESS).message(MI0006).build();
+        return BaseResponse.builder().status(SUCCESS).message(MI0003).build();
     }
 }

@@ -1,9 +1,7 @@
 package dev9.lapco.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Getter
@@ -23,11 +21,14 @@ public class AccountType extends BaseEntity {
 
     private String email;
 
+    @NotNull
+    @NonNull
     private String phoneNumber;
 
     /**
      * Số căn cước công dân
      */
+    @NotNull
     private String IdentifyNo;
 
     /**

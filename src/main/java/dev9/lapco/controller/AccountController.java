@@ -1,5 +1,10 @@
 package dev9.lapco.controller;
 
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import dev9.lapco.constant.Message;
 import dev9.lapco.constant.StatusCode;
 import dev9.lapco.request.ChangPasswordRequest;
@@ -9,11 +14,6 @@ import dev9.lapco.response.BaseResponse;
 import dev9.lapco.response.LoginResponse;
 import dev9.lapco.service.AccountService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor

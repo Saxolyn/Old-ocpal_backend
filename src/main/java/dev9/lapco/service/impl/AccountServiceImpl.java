@@ -1,4 +1,4 @@
-package dev9.lapco.service.serviceImpl;
+package dev9.lapco.service.impl;
 
 import dev9.lapco.commonUtil.ValidateUtil;
 import dev9.lapco.config.jwt.JwtUtils;

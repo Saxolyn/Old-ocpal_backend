@@ -1,8 +1,12 @@
-package dev9.lapco.service.serviceImpl;
+package dev9.lapco.service.impl;
+
+import java.util.Optional;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import dev9.lapco.commonUtil.ConvertedUtil;
 import dev9.lapco.commonUtil.ValidateUtil;
-import dev9.lapco.config.security.UserDetailsImpl;
 import dev9.lapco.constant.ERole;
 import dev9.lapco.constant.Message;
 import dev9.lapco.constant.StatusCode;
@@ -18,15 +22,10 @@ import dev9.lapco.request.CreatedUserRequest;
 import dev9.lapco.response.CreatedUserResponse;
 import dev9.lapco.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class StudentServiceImpl implements UserService, StatusCode, Message {
+public class UserServiceImpl implements UserService, StatusCode, Message {
 
     private final StudentRepository studentRepository;
 
@@ -42,13 +41,6 @@ public class StudentServiceImpl implements UserService, StatusCode, Message {
 
     @Override
     public CreatedUserResponse createdNew(CreatedUserRequest createdUserRequest) {
-
-        UserDetailsImpl loggedUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (loggedUser == null) {
-            return CreatedUserResponse.builder().status(UNAUTHORIZED).message(ME0002).build();
-        }
-
         Optional<AccountEntity> checkAccount = accountRepository.findAccount(createdUserRequest.getPhoneNumber());
         if (checkAccount.isPresent()) {
             return CreatedUserResponse.builder().status(BAD_REQUEST).message(ME0005).errorCode(false).build();

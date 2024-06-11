@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService, StatusCode, Message {
 
     @Override
     public CreatedUserResponse createdNew(CreatedUserRequest createdUserRequest) {
-        Optional<AccountEntity> checkAccount = accountRepository.findAccount(createdUserRequest.getPhoneNumber());
+        Optional<AccountEntity> checkAccount = accountRepository.findAccount(createdUserRequest.getPhoneNumber(), false);
         if (checkAccount.isPresent()) {
             return CreatedUserResponse.builder().status(BAD_REQUEST).message(ME0005).errorCode(false).build();
         }

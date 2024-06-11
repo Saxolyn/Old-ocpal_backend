@@ -5,9 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.*;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 
@@ -21,16 +20,19 @@ public class BaseEntity {
     @Id
     private String id;
 
+    @CreatedBy
     private String createdUser;
 
     @CreatedDate
     private LocalDateTime createdDate;
 
+    @LastModifiedBy
     private String updatedUser;
 
     @LastModifiedDate
     private LocalDateTime updatedDate;
 
-    private Boolean isDeleted = false;
+    @Field(value = "isDelete")
+    private Boolean isDeleted;
 
 }

@@ -61,7 +61,7 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
 
     @Override
     public BaseResponse restorePassword(RestorePasswordRequest request) {
-        Optional<AccountEntity> account = accountRepository.findAccount(request.getPhoneNumber());
+        Optional<AccountEntity> account = accountRepository.findAccount(request.getPhoneNumber(), false);
         if (account.isEmpty()) {
             return BaseResponse.builder().status(NOT_FOUND).message(ME0007).build();
         }
@@ -85,7 +85,7 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
     public BaseResponse changePassword(ChangPasswordRequest request) {
         UserDetailsImpl loggedUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        Optional<AccountEntity> account = accountRepository.findAccount(loggedUser.getPhoneNumber());
+        Optional<AccountEntity> account = accountRepository.findAccount(loggedUser.getPhoneNumber(), false);
         if(account.isEmpty()) {
             return BaseResponse.builder().status(NOT_FOUND).message(ME0002).build();
         }

@@ -35,6 +35,7 @@ public class ConvertedUtil {
                         .image(defaultImageAddress)
                         //TODO :chưa có logic tạo mã admin
                         .userCode("admin")
+                        .isDeleted(false)
                         .password(null)
                         .build();
 
@@ -49,6 +50,7 @@ public class ConvertedUtil {
                         .IdentifyNo(newUserRequest.getIdentityNumber())
                         .image(defaultImageAddress)
                         .userCode(lapcoUtil.teacherCodeGenerator(newUserRequest.getIdentityNumber()))
+                        .isDeleted(false)
                         //TODO :chưa có logic tạo mã lớp
                         .classCodes(List.of("0001"))
                         //TODO :chưa có logic tạo mã chương trình
@@ -68,6 +70,7 @@ public class ConvertedUtil {
                         .IdentifyNo(newUserRequest.getIdentityNumber())
                         .image(defaultImageAddress)
                         .userCode(lapcoUtil.studentCodeGenerator(newUserRequest.getIdentityNumber()))
+                        .isDeleted(false)
                         .isRemote(false)
                         .completionRate(0F)
                         .build();

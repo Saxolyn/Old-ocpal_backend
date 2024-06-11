@@ -1,13 +1,13 @@
 package dev9.lapco.controller;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import dev9.lapco.request.CreatedUserRequest;
+import dev9.lapco.request.DeletedUserRequest;
+import dev9.lapco.response.BaseResponse;
 import dev9.lapco.response.CreatedUserResponse;
+import dev9.lapco.response.GetUserResponse;
 import dev9.lapco.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,8 +15,19 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("add-user")
+    @PostMapping("/add-user")
     public CreatedUserResponse addUser(@RequestBody CreatedUserRequest createdUserRequest) {
         return userService.createdNew(createdUserRequest);
     }
+
+    @GetMapping("/get-user")
+    public GetUserResponse getUserList (){
+        return userService.getUserList();
+    }
+
+    @PutMapping("/delete-one")
+    public BaseResponse deleteUser (@RequestBody DeletedUserRequest deletedUserRequest) {
+        return userService.deleteUser(deletedUserRequest);
+    }
+
 }

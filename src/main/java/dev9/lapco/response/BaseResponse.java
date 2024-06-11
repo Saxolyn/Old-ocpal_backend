@@ -23,4 +23,5 @@ public class BaseResponse {
 
     @Builder.Default
     private Boolean errorCode = false;
+
 }

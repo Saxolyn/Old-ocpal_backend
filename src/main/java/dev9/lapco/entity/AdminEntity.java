@@ -13,4 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class AdminEntity extends AccountType{
 
     private String password;
+
+    private Boolean isLock;
+
 }

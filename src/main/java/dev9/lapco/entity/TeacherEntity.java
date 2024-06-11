@@ -21,7 +21,7 @@ public class TeacherEntity extends AccountType {
 
     private List<String> programCodes;
 
-    private boolean isLock = false;
+    private boolean isLock;
 
 
 }

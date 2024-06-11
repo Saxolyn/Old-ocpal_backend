@@ -35,6 +35,7 @@ public class ConvertedUtil {
                         .image(defaultImageAddress)
                         //TODO :chưa có logic tạo mã admin
                         .userCode("admin")
+                        .isLock(false)
                         .isDeleted(false)
                         .password(null)
                         .build();
@@ -85,6 +86,7 @@ public class ConvertedUtil {
                 .phoneNumber(newUserRequest.getPhoneNumber())
                 .password(newUserRequest.getIdentityNumber())
                 .role(newUserRequest.getRole())
+                .isDeleted(false)
                 .build();
     }
 

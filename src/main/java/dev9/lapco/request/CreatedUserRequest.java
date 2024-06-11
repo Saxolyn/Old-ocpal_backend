@@ -24,7 +24,7 @@ public class CreatedUserRequest {
     @NotNull
     private String phoneNumber;
 
-    @Schema(example = "not set yet" )
+    @NotNull
     private String username;
 
     @NotNull

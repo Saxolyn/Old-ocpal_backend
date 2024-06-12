@@ -1,6 +1,6 @@
 package dev9.lapco.service.impl;
 
-import dev9.lapco.commonUtil.ValidateUtil;
+import dev9.lapco.util.ValidateUtil;
 import dev9.lapco.config.jwt.JwtUtils;
 import dev9.lapco.config.security.UserDetailsImpl;
 import dev9.lapco.constant.Message;

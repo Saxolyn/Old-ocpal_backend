@@ -14,13 +14,15 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-@Document(collection = "student_account")
-public class StudentEntity extends AccountType {
+@Document(value = "question")
+public class QuestionEntity extends BaseEntity {
 
-    private List<ClassEntity> classCodes;
+    private String questionCode;
 
-    private Boolean isRemote;
+    private String questionContent;
 
-    private CompletionRateEntity completionRate;
+    private List<String> answerList;
+
+    private String trueAnswer;
 
 }

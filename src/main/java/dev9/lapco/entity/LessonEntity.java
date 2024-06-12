@@ -14,13 +14,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-@Document(collection = "student_account")
-public class StudentEntity extends AccountType {
+@Document(value = "lesson")
+public class LessonEntity extends BaseEntity {
 
-    private List<ClassEntity> classCodes;
+    private String lessonName;
 
-    private Boolean isRemote;
+    private String lessonDescription;
 
-    private CompletionRateEntity completionRate;
+    private List<VideoEntity> videoList;
 
 }

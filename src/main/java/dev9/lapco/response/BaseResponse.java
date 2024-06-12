@@ -1,6 +1,6 @@
 package dev9.lapco.response;
 
-import dev9.lapco.commonUtil.OcpalUtil;
+import dev9.lapco.util.OcpalUtil;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 

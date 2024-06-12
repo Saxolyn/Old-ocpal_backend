@@ -7,20 +7,24 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-@Document(collection = "student_account")
-public class StudentEntity extends AccountType {
+@Document(value = "course_mark")
+public class CourseMark extends BaseEntity {
 
-    private List<ClassEntity> classCodes;
+    private String testCode;
 
-    private Boolean isRemote;
+    private long testTime;
 
-    private CompletionRateEntity completionRate;
+    private TeacherEntity createdTeacher;
+
+    private long mark;
+
+    private String description;
+
+    private String comment;
 
 }

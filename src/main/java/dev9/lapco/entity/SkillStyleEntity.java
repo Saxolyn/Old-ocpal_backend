@@ -9,9 +9,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-@Document(collection = "admin_account")
-public class AdminEntity extends AccountType{
+@Document(value = "skill_style")
+public class SkillStyleEntity extends BaseEntity{
+    private String skillStyleName;
 
-    private String password;
+    private String skillStyleDescription;
+
+    private String skillStyleCode;
 
 }

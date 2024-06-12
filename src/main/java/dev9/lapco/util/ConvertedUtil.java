@@ -1,9 +1,6 @@
-package dev9.lapco.commonUtil;
+package dev9.lapco.util;
 
-import dev9.lapco.entity.AccountEntity;
-import dev9.lapco.entity.AdminEntity;
-import dev9.lapco.entity.StudentEntity;
-import dev9.lapco.entity.TeacherEntity;
+import dev9.lapco.entity.*;
 import dev9.lapco.request.CreatedUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
@@ -31,7 +28,7 @@ public class ConvertedUtil {
                         .address(Strings.isBlank(newUserRequest.getAddress()) ? null : newUserRequest.getAddress())
                         .email(Strings.isBlank(newUserRequest.getEmail()) ? null : newUserRequest.getEmail())
                         .phoneNumber(newUserRequest.getPhoneNumber())
-                        .IdentifyNo(newUserRequest.getIdentityNumber())
+                        .identifyNo(newUserRequest.getIdentityNumber())
                         .image(defaultImageAddress)
                         //TODO :chưa có logic tạo mã admin
                         .userCode("admin")
@@ -48,7 +45,7 @@ public class ConvertedUtil {
                         .address(Strings.isBlank(newUserRequest.getAddress()) ? null : newUserRequest.getAddress())
                         .email(Strings.isBlank(newUserRequest.getEmail()) ? null : newUserRequest.getEmail())
                         .phoneNumber(newUserRequest.getPhoneNumber())
-                        .IdentifyNo(newUserRequest.getIdentityNumber())
+                        .identifyNo(newUserRequest.getIdentityNumber())
                         .image(defaultImageAddress)
                         .userCode(lapcoUtil.teacherCodeGenerator(newUserRequest.getIdentityNumber()))
                         .isDeleted(false)
@@ -68,12 +65,12 @@ public class ConvertedUtil {
                         .address(Strings.isBlank(newUserRequest.getAddress()) ? null : newUserRequest.getAddress())
                         .email(Strings.isBlank(newUserRequest.getEmail()) ? null : newUserRequest.getEmail())
                         .phoneNumber(newUserRequest.getPhoneNumber())
-                        .IdentifyNo(newUserRequest.getIdentityNumber())
+                        .identifyNo(newUserRequest.getIdentityNumber())
                         .image(defaultImageAddress)
                         .userCode(lapcoUtil.studentCodeGenerator(newUserRequest.getIdentityNumber()))
                         .isDeleted(false)
                         .isRemote(false)
-                        .completionRate(0F)
+                        .completionRate(CompletionRateEntity.builder().completionRate(0).studyTime(0).build())
                         .build();
         }
 

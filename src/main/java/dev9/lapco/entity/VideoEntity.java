@@ -7,20 +7,20 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-@Document(collection = "student_account")
-public class StudentEntity extends AccountType {
+@Document(value = "video_source")
+public class VideoEntity {
 
-    private List<ClassEntity> classCodes;
+    private String videoName;
 
-    private Boolean isRemote;
+    private String videoCode;
 
-    private CompletionRateEntity completionRate;
+    private String path;
+
+    private long duration;
 
 }

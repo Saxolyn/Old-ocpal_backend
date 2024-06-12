@@ -1,7 +1,7 @@
 package dev9.lapco.service.impl;
 
-import dev9.lapco.commonUtil.ConvertedUtil;
-import dev9.lapco.commonUtil.ValidateUtil;
+import dev9.lapco.util.ConvertedUtil;
+import dev9.lapco.util.ValidateUtil;
 import dev9.lapco.config.security.UserDetailsImpl;
 import dev9.lapco.constant.ERole;
 import dev9.lapco.constant.Message;

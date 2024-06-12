@@ -29,7 +29,7 @@ public class AccountType extends BaseEntity {
      * Số căn cước công dân
      */
     @NotNull
-    private String IdentifyNo;
+    private String identifyNo;
 
     /**
      * Đường dẫn ảnh đại diện
@@ -37,5 +37,7 @@ public class AccountType extends BaseEntity {
     private String image;
 
     private String userCode;
+
+    private boolean isLock;
 
 }

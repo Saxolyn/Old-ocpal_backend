@@ -1,4 +1,4 @@
-package dev9.lapco.commonUtil;
+package dev9.lapco.util;
 
 import dev9.lapco.constant.Pattern;
 import org.apache.commons.lang3.RandomStringUtils;

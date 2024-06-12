@@ -21,7 +21,6 @@ import dev9.lapco.response.BaseResponse;
 import dev9.lapco.response.CreatedUserResponse;
 import dev9.lapco.response.GetUserResponse;
 import dev9.lapco.service.UserService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,7 +49,7 @@ public class UserServiceImpl implements UserService, StatusCode, Message {
     @Override
     public CreatedUserResponse createdNew(CreatedUserRequest createdUserRequest) {
         UserDetailsImpl currentUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<AccountEntity> checkAccount = accountRepository.findAccount(createdUserRequest.getPhoneNumber(), false);
+        Optional<AccountEntity> checkAccount = accountRepository.findAccount(createdUserRequest.getPhoneNumber());
         if (checkAccount.isPresent()) {
             return CreatedUserResponse.builder().status(BAD_REQUEST).message(ME0005).errorCode(false).build();
         }
@@ -62,22 +61,42 @@ public class UserServiceImpl implements UserService, StatusCode, Message {
                 createdUserRequest.setRole(ERole.STUDENT);
             }
             try {
-                switch (createdUserRequest.getRole()) {
-                    case ADMIN:
-                        if (currentUser.getRole().equals(ERole.ADMIN)) {
-                            return CreatedUserResponse.builder().status(BAD_REQUEST).message(ME0002).errorCode(true).build();
+                switch (currentUser.getRole()) {
+                    case SUPER_ADMIN:
+                        switch (createdUserRequest.getRole()){
+                             case ADMIN:
+                                AdminEntity newAdmin = (AdminEntity) convertedUtil.convertNewUserRequestToStudentEntity(createdUserRequest);
+                                adminRepository.save(newAdmin);
+                                break;
+                            case TEACHER:
+                                TeacherEntity newTeacher = (TeacherEntity) convertedUtil.convertNewUserRequestToStudentEntity(createdUserRequest);
+                                teacherRepository.save(newTeacher);
+                                break;
+                            case STUDENT:
+                                StudentEntity newStudent = (StudentEntity) convertedUtil.convertNewUserRequestToStudentEntity(createdUserRequest);
+                                studentRepository.save(newStudent);
+                                break;
+                            case SUPER_ADMIN:
+                            default:
+                                return CreatedUserResponse.builder().status(BAD_REQUEST).message(ME0002).errorCode(true).build();
                         }
-                        AdminEntity newAdmin = (AdminEntity) convertedUtil.convertNewUserRequestToStudentEntity(createdUserRequest);
-                        adminRepository.save(newAdmin);
-                        break;
+                    case ADMIN:
+                        switch (createdUserRequest.getRole()){
+                            case TEACHER:
+                                TeacherEntity newTeacher = (TeacherEntity) convertedUtil.convertNewUserRequestToStudentEntity(createdUserRequest);
+                                teacherRepository.save(newTeacher);
+                                break;
+                            case STUDENT:
+                                StudentEntity newStudent = (StudentEntity) convertedUtil.convertNewUserRequestToStudentEntity(createdUserRequest);
+                                studentRepository.save(newStudent);
+                                break;
+                            case SUPER_ADMIN:
+                            case ADMIN:
+                            default:
+                                return CreatedUserResponse.builder().status(BAD_REQUEST).message(ME0002).errorCode(true).build();
+                        }
                     case TEACHER:
-                        TeacherEntity newTeacher = (TeacherEntity) convertedUtil.convertNewUserRequestToStudentEntity(createdUserRequest);
-                        teacherRepository.save(newTeacher);
-                        break;
                     case STUDENT:
-                        StudentEntity newStudent = (StudentEntity) convertedUtil.convertNewUserRequestToStudentEntity(createdUserRequest);
-                        studentRepository.save(newStudent);
-                        break;
                     default:
                 }
                 createdUserRequest.setIdentityNumber(passwordEncoder.encode(createdUserRequest.getIdentityNumber()));
@@ -101,7 +120,7 @@ public class UserServiceImpl implements UserService, StatusCode, Message {
     @Override
     public GetUserResponse getUserList() {
         UserDetailsImpl currentUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<AccountEntity> accountList = accountRepository.findAll(false);
+        List<AccountEntity> accountList = accountRepository.findAllAccount();
         if (accountList.isEmpty()) {
             //TODO tìm cách sửa thaành ném ra exception
             return GetUserResponse.builder().status(SUCCESS).message(MI0005).errorCode(false).build();
@@ -142,7 +161,7 @@ public class UserServiceImpl implements UserService, StatusCode, Message {
     @Override
     public BaseResponse deleteUser(DeletedUserRequest deletedUserRequest) {
         UserDetailsImpl currentUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<AccountEntity> accountRequest = accountRepository.findAccount(deletedUserRequest.getPhoneNumber(), false);
+        Optional<AccountEntity> accountRequest = accountRepository.findAccount(deletedUserRequest.getPhoneNumber());
         if (accountRequest.isEmpty()) {
             return BaseResponse.builder().status(BAD_REQUEST).message(ME0007).errorCode(true).build();
         }

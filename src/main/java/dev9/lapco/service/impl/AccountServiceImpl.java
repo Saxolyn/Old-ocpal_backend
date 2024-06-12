@@ -14,9 +14,9 @@ import dev9.lapco.response.BaseResponse;
 import dev9.lapco.response.LoginResponse;
 import dev9.lapco.service.AccountService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService, StatusCode, Message {
 
@@ -48,20 +49,23 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-            String jwtToken = jwtUtils.generateToken(userDetails);
+                        String jwtToken = jwtUtils.generateToken(userDetails);
 
-            AccountEntity accountEntity = new AccountEntity();
-            accountEntity.setPhoneNumber(account.getPhoneNumber());
-            accountEntity.setRole(userDetails.getRole());
-            return LoginResponse.builder().status(SUCCESS).errorCode(false).account(accountEntity).token(jwtToken).build();
+            return LoginResponse.builder()
+                    .status(SUCCESS)
+                    .message(MI0006)
+                    .errorCode(false).
+                    account(accountRepository.findAccount(userDetails.getPhoneNumber()).get())
+                    .token(jwtToken).build();
         } catch (Exception e) {
-            throw new BadCredentialsException(ME0004, new Throwable(e.getMessage()));
+            log.info(ME0004);
+            return LoginResponse.builder().status(BAD_REQUEST).message(ME0004).errorCode(true).build();
         }
     }
 
     @Override
     public BaseResponse restorePassword(RestorePasswordRequest request) {
-        Optional<AccountEntity> account = accountRepository.findAccount(request.getPhoneNumber(), false);
+        Optional<AccountEntity> account = accountRepository.findAccount(request.getPhoneNumber());
         if (account.isEmpty()) {
             return BaseResponse.builder().status(NOT_FOUND).message(ME0007).build();
         }
@@ -85,7 +89,7 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
     public BaseResponse changePassword(ChangPasswordRequest request) {
         UserDetailsImpl loggedUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        Optional<AccountEntity> account = accountRepository.findAccount(loggedUser.getPhoneNumber(), false);
+        Optional<AccountEntity> account = accountRepository.findAccount(loggedUser.getPhoneNumber());
         if(account.isEmpty()) {
             return BaseResponse.builder().status(NOT_FOUND).message(ME0002).build();
         }

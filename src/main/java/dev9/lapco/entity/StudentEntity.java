@@ -22,5 +22,4 @@ public class StudentEntity extends AccountType {
 
     private float completionRate;
 
-
 }

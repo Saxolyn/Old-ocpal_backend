@@ -24,7 +24,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, Message {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {
-        AccountEntity account = accountRepository.findAccount(phoneNumber, false).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + phoneNumber));
+        AccountEntity account = accountRepository.findAccount(phoneNumber).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + phoneNumber));
         List<SimpleGrantedAuthority> grantedAuthorities;
         ERole roles = account.getRole();
         switch (roles){

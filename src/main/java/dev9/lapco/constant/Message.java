@@ -23,7 +23,7 @@ public interface Message {
 
     static final String ME0003 = "Cannot find role of user with username/phone number:";
 
-    static final String ME0004 = "Invalid credentials";
+    static final String ME0004 = "Account does not exist";
 
     static final String ME0005 = "username already exists";
 

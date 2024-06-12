@@ -23,5 +23,4 @@ public class TeacherEntity extends AccountType {
 
     private boolean isLock;
 
-
 }

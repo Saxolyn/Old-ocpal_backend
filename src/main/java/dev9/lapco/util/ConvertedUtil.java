@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ConvertedUtil {
 
-    @Value("${default.image.address}")
+    @Value("${application.default.image.address}")
     private String defaultImageAddress;
 
     private final OcpalUtil lapcoUtil;
@@ -73,8 +73,6 @@ public class ConvertedUtil {
                         .completionRate(CompletionRateEntity.builder().completionRate(0).studyTime(0).build())
                         .build();
         }
-
-
     }
 
     public AccountEntity convertToAccountEntity(CreatedUserRequest newUserRequest) {
@@ -86,6 +84,4 @@ public class ConvertedUtil {
                 .isDeleted(false)
                 .build();
     }
-
-
 }

@@ -17,6 +17,8 @@ public interface Message {
 
     static final String MI0006 = "Progress successfully";
 
+    static final String MI0007 = "Adding video process successfully";
+
     static final String ME0001 = "Unauthorized error: {}";
 
     static final String ME0002 = "You are not authorized";
@@ -37,7 +39,17 @@ public interface Message {
 
     static final String ME0010 = "Account has been deleted";
 
+    static final String ME0011 = "Video has not been selected";
+
+    static final String ME0012 = "Video name has been existed";
+
     static final String MF0001 = "Error occur when creating new user ";
 
     static final String MF0002 = "Error occur when delete user ";
+
+    static final String MF0003 = "Unable to determine duration";
+
+    static final String MF0004 = "Unable to upload video";
+
+    static final String MF0005 = "Unable to get path relate of this video name";
 }

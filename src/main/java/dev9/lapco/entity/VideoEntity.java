@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @SuperBuilder
 @Document(value = "video_source")
-public class VideoEntity {
+public class VideoEntity extends BaseEntity {
 
     private String videoName;
 
@@ -21,6 +21,6 @@ public class VideoEntity {
 
     private String path;
 
-    private long duration;
+    private String duration;
 
 }

@@ -137,25 +137,20 @@ public class FileUtil implements Constants, Message {
             if (dashPos > 0 && dashPos <= (rangeValues.length() - 1)) {
                 String[] rangesArr = rangeValues.split("-");
 
-                if (rangesArr != null && rangesArr.length > 0) {
+                if (rangesArr.length > 0) {
                     System.out.println("ArraySize: " + rangesArr.length);
                     if (StringUtils.hasText(rangesArr[0])) {
                         System.out.println("Rang values[0]: [" + rangesArr[0] + "]");
                         String valToParse = numericStringValue(rangesArr[0]);
-                        rangeStart = safeParseStringValuetoLong(valToParse, 0L);
-                    } else {
-                        rangeStart = 0L;
+                        rangeStart = safeParseStringValueToLong(valToParse, 0L);
                     }
-
                     if (rangesArr.length > 1) {
                         System.out.println("Rang values[1]: [" + rangesArr[1] + "]");
                         String valToParse = numericStringValue(rangesArr[1]);
-                        rangeEnd = safeParseStringValuetoLong(valToParse, 0L);
+                        rangeEnd = safeParseStringValueToLong(valToParse, 0L);
                     } else {
                         if (fileSize > 0) {
                             rangeEnd = fileSize - 1L;
-                        } else {
-                            rangeEnd = 0L;
                         }
                     }
                 }
@@ -225,6 +220,7 @@ public class FileUtil implements Constants, Message {
                 }
                 os.flush();
             } catch (Exception e) {
+                e.printStackTrace();
             }
         };
 
@@ -242,7 +238,7 @@ public class FileUtil implements Constants, Message {
         return retVal;
     }
 
-    private long safeParseStringValuetoLong(String valToParse, long defaultVal) {
+    private long safeParseStringValueToLong(String valToParse, long defaultVal) {
         long retVal = defaultVal;
         if (StringUtils.hasText(valToParse)) {
             try {
@@ -272,8 +268,7 @@ public class FileUtil implements Constants, Message {
 
     public String getVideoPath(String fileName){
         try{
-            Path path = Paths.get(videoStorageLocation + File.separator + fileName);
-            return path.toString();
+            return Paths.get(videoStorageLocation + File.separator + fileName).toString();
         }catch (Exception e){
             log.error(MF0005);
             e.printStackTrace();

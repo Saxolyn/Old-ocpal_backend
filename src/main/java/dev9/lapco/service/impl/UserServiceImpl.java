@@ -117,6 +117,7 @@ public class UserServiceImpl implements UserService, StatusCode, Message {
                 .build();
     }
 
+
     @Override
     public GetUserResponse getUserList() {
         UserDetailsImpl currentUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -125,6 +126,7 @@ public class UserServiceImpl implements UserService, StatusCode, Message {
             //TODO tìm cách sửa thaành ném ra exception
             return GetUserResponse.builder().status(SUCCESS).message(MI0005).errorCode(false).build();
         }
+        //TODO : not had paginator yet
         switch (currentUser.getRole()) {
             case SUPER_ADMIN:
                 return GetUserResponse.builder().status(SUCCESS).message(MI0006).errorCode(false).baseUserDTOList(                        accountList.stream()

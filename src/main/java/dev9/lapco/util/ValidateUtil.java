@@ -1,11 +1,18 @@
 package dev9.lapco.util;
 
+import dev9.lapco.config.security.UserDetailsImpl;
+import dev9.lapco.constant.ERole;
+import dev9.lapco.constant.Message;
 import dev9.lapco.constant.Pattern;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.regex.Matcher;
 
-public class ValidateUtil implements Pattern {
+public class ValidateUtil implements Pattern, Message {
+
+
 
     public static boolean isValidPhoneNumber(String phoneNumber) {
         if (Strings.isEmpty(phoneNumber) || Strings.isBlank(phoneNumber)) {
@@ -58,6 +65,17 @@ public class ValidateUtil implements Pattern {
         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(Pattern.IDENTITY_CARD_PATTERN);
         Matcher matcher = pattern.matcher(identityCard);
         return matcher.matches();
+    }
+
+    public static boolean isValidAuthority() {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        if (userDetails == null) {
+            return false;
+        }
+        if (!userDetails.getRole().equals(ERole.SUPER_ADMIN) && !userDetails.getRole().equals(ERole.ADMIN)) {
+            return false;
+        }
+        return true;
     }
 
 

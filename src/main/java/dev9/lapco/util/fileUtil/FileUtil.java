@@ -2,6 +2,7 @@ package dev9.lapco.util.fileUtil;
 
 import dev9.lapco.constant.Constants;
 import dev9.lapco.constant.Message;
+import dev9.lapco.request.VideoRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.apache.tika.metadata.Metadata;
@@ -24,6 +25,8 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -70,7 +73,7 @@ public class FileUtil implements Constants, Message {
 
             String duration = metadata.get("xmpDM:duration");
             if (duration != null) {
-                Long durationInSeconds = ((Double) (Math.ceil(Double.parseDouble(duration) / 1000))).longValue(); // Convert milliseconds to seconds
+                Long durationInSeconds = ((Double) (Math.ceil(Double.parseDouble(duration)))).longValue(); // Convert milliseconds to seconds
                 return formatDuration(durationInSeconds);
             }
         } catch (Exception e) {
@@ -251,7 +254,7 @@ public class FileUtil implements Constants, Message {
         return retVal;
     }
 
-    public String saveVideo(MultipartFile file, String fileName) {
+    public Optional<String> saveVideo(MultipartFile file, String fileName) {
     try {
             if (Strings.isBlank(fileName)) {
                 fileName = file.getName();
@@ -261,20 +264,44 @@ public class FileUtil implements Constants, Message {
     } catch (Exception e) {
             log.error(MF0004);
             e.printStackTrace();
-            return null;
+            return Optional.empty();
         }
-        return getDuration(fileName);
+        return Optional.of(getDuration(fileName));
     }
 
-    public String getVideoPath(String fileName){
+    public Optional<String> getVideoPath(String fileName){
         try{
-            return Paths.get(videoStorageLocation + File.separator + fileName).toString();
+            return Optional.of(Paths.get(videoStorageLocation + File.separator + fileName).toString());
         }catch (Exception e){
             log.error(MF0005);
             e.printStackTrace();
-            return null;
+            return Optional.empty();
         }
 
     }
+
+    public boolean isDeleteVideo(VideoRequest video) {
+        try{
+            if(!Strings.isBlank(video.getVideoPath())
+                  && !Objects.equals(video.getVideoName(),video.getVideoPath())){
+                throw new Exception(MF0006);
+            }
+            File file = new File(video.getVideoPath());
+
+//            if(file.getName())
+
+            return Files.deleteIfExists(file.toPath());
+        } catch (Exception e){
+            log.info(MF0006);
+            e.printStackTrace();
+            return false;
+        }
+
+
+    }
+
+//    public String convertPathSeperator(String path){
+//        return path.replace()
+//    }
 
 }

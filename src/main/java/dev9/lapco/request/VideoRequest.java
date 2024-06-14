@@ -1,10 +1,10 @@
 package dev9.lapco.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -12,8 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 public class VideoRequest {
 
+    @NotNull
     private String videoName;
 
-    private MultipartFile videoFile;
+    private String videoPath;
 
 }

@@ -1,9 +1,6 @@
 package dev9.lapco.controller;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import dev9.lapco.constant.Message;
 import dev9.lapco.constant.StatusCode;

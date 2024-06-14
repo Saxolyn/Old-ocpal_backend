@@ -11,16 +11,17 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/add-user")
+    @PostMapping("/add")
     public CreatedUserResponse addUser(@RequestBody CreatedUserRequest createdUserRequest) {
         return userService.createdNew(createdUserRequest);
     }
 
-    @GetMapping("/get-user")
+    @GetMapping(value = "/get")
     public GetUserResponse getUserList (){
         return userService.getUserList();
     }

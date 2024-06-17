@@ -15,6 +15,4 @@ public class VideoRequest {
     @NotNull
     private String videoName;
 
-    private String videoPath;
-
 }

@@ -2,9 +2,9 @@ package dev9.lapco.util.fileUtil;
 
 import dev9.lapco.constant.Constants;
 import dev9.lapco.constant.Message;
-import dev9.lapco.request.VideoRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
+import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
@@ -23,10 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -34,67 +31,6 @@ public class FileUtil implements Constants, Message {
 
     @Value("${application.video.storage}")
     private String videoStorageLocation;
-
-    public List<String> getFileLocationList() {
-        File directory = new File(videoStorageLocation);
-        File[] files = directory.listFiles();
-        if (files == null) {
-            return List.of();
-        }
-        return Arrays.stream(files).toList().stream().map(File::getName).toList();
-    }
-
-    public byte[] readFile(String fileName) throws IOException {
-        File file = new File(videoStorageLocation + File.separator + fileName);
-        if (!file.exists()) {
-            return null;
-
-        }
-        return Files.readAllBytes(Paths.get(file.getPath()));
-    }
-
-    public File getFile(String fileName) throws IOException {
-        File file = new File(videoStorageLocation + File.separator + fileName);
-        if (!file.exists()) {
-            return null;
-        }
-        return file;
-    }
-
-    public String getDuration(String fileName) {
-        File file = new File(videoStorageLocation + File.separator + fileName);
-        Metadata metadata = new Metadata();
-        try (InputStream inputStream = new FileInputStream(file)) {
-            AutoDetectParser parser = new AutoDetectParser();
-            BodyContentHandler handler = new BodyContentHandler();
-            ParseContext context = new ParseContext();
-
-            parser.parse(inputStream, handler, metadata, context);
-
-            String duration = metadata.get("xmpDM:duration");
-            if (duration != null) {
-                Long durationInSeconds = ((Double) (Math.ceil(Double.parseDouble(duration)))).longValue(); // Convert milliseconds to seconds
-                return formatDuration(durationInSeconds);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return MF0003;
-        }
-        return MF0003;
-
-    }
-
-    public String formatDuration(Long seconds) {
-        if (seconds == null || seconds < 0) {
-            return DEFAULT_DURATION_VIDEO;
-        }
-        Duration duration = Duration.ofSeconds(seconds);
-        long hours = duration.toHours();
-        long minutes = duration.toMinutesPart();
-        long secs = duration.toSecondsPart();
-
-        return String.format(DEFAULT_DURATION_VIDEO_PATTERN, hours, minutes, secs);
-    }
 
     public ResponseEntity<StreamingResponseBody> loadEntireMediaFile(String localMediaFilePath) throws IOException {
         Path filePath = Paths.get(localMediaFilePath);
@@ -254,25 +190,81 @@ public class FileUtil implements Constants, Message {
         return retVal;
     }
 
-    public Optional<String> saveVideo(MultipartFile file, String fileName) {
-    try {
+    public String saveVideo(MultipartFile file, String fileName) {
+        try {
             if (Strings.isBlank(fileName)) {
                 fileName = file.getName();
             }
-        file.transferTo( Paths.get(videoStorageLocation + File.separator + fileName));
-
-    } catch (Exception e) {
+            if(file.isEmpty()){
+                return null;
+            }
+            String originalFilename = file.getOriginalFilename();
+            if(!Strings.isBlank(originalFilename)){
+                String fileExtension = getFileExtension(originalFilename);
+                String mimeType = detectMimeType(file);
+                if (isValidExtension(fileExtension, mimeType)) {
+                    String customFileName = fileName + DOT + fileExtension;
+                    file.transferTo(Paths.get(videoStorageLocation + File.separator + customFileName));
+                    return customFileName + HYPHEN + getDuration(customFileName);
+                }
+            }
+        } catch (Exception e) {
             log.error(MF0004);
             e.printStackTrace();
-            return Optional.empty();
+            return null;
         }
-        return Optional.of(getDuration(fileName));
+        return null;
     }
 
-    public Optional<String> getVideoPath(String fileName){
-        try{
+    public boolean isDeleteVideo(String fileName) {
+        try {
+            Optional<String> filePath = getVideoPath(fileName);
+            if (filePath.isPresent()) {
+                return Files.deleteIfExists(new File(filePath.get()).toPath());
+            }
+            return false;
+        } catch (Exception e) {
+            log.info(MF0006);
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public String getAbsoluteFileName(MultipartFile file, String fileName) {
+        String originalFilename = file.getOriginalFilename();
+        if(Strings.isBlank(originalFilename)){
+            return null;
+        }
+        return fileName + DOT + getFileExtension(originalFilename);
+    }
+
+    public String getDuration(String fileName) {
+        File file = new File(videoStorageLocation + File.separator + fileName);
+        Metadata metadata = new Metadata();
+        try (InputStream inputStream = new FileInputStream(file)) {
+            AutoDetectParser parser = new AutoDetectParser();
+            BodyContentHandler handler = new BodyContentHandler();
+            ParseContext context = new ParseContext();
+
+            parser.parse(inputStream, handler, metadata, context);
+
+            String duration = metadata.get("xmpDM:duration");
+            if (duration != null) {
+                Long durationInSeconds = ((Double) (Math.ceil(Double.parseDouble(duration)))).longValue(); // Convert milliseconds to seconds
+                return formatDuration(durationInSeconds);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return MF0003;
+        }
+        return MF0003;
+
+    }
+
+    private Optional<String> getVideoPath(String fileName) {
+        try {
             return Optional.of(Paths.get(videoStorageLocation + File.separator + fileName).toString());
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(MF0005);
             e.printStackTrace();
             return Optional.empty();
@@ -280,28 +272,36 @@ public class FileUtil implements Constants, Message {
 
     }
 
-    public boolean isDeleteVideo(VideoRequest video) {
-        try{
-            if(!Strings.isBlank(video.getVideoPath())
-                  && !Objects.equals(video.getVideoName(),video.getVideoPath())){
-                throw new Exception(MF0006);
-            }
-            File file = new File(video.getVideoPath());
-
-//            if(file.getName())
-
-            return Files.deleteIfExists(file.toPath());
-        } catch (Exception e){
-            log.info(MF0006);
-            e.printStackTrace();
-            return false;
-        }
-
-
+    private String detectMimeType(MultipartFile file) throws IOException {
+        Tika tika = new Tika();
+        return tika.detect(file.getInputStream());
     }
 
-//    public String convertPathSeperator(String path){
-//        return path.replace()
-//    }
+    private boolean isValidExtension(String fileExtension, String mimeType) {
+        Map<String, String> mimeTypeMap = new HashMap<>();
+        mimeTypeMap.put("mp4", "video/mp4");
 
-}
+        String expectedMimeType = mimeTypeMap.get(fileExtension);
+        return expectedMimeType != null && expectedMimeType.equals(mimeType);
+    }
+    private String getFileExtension(String filename) {
+        int lastDotIndex = filename.lastIndexOf(DOT);
+        if (lastDotIndex != -1 && lastDotIndex < filename.length() - 1) {
+            return filename.substring(lastDotIndex + 1).toLowerCase();
+        } else {
+            return ME0014;
+        }
+    }
+
+    private String formatDuration(Long seconds) {
+        if (seconds == null || seconds < 0) {
+            return DEFAULT_DURATION_VIDEO;
+        }
+        Duration duration = Duration.ofSeconds(seconds);
+        long hours = duration.toHours();
+        long minutes = duration.toMinutesPart();
+        long secs = duration.toSecondsPart();
+
+        return String.format(DEFAULT_DURATION_VIDEO_PATTERN, hours, minutes, secs);
+    }
+    }

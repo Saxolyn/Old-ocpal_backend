@@ -47,6 +47,8 @@ public interface Message {
 
     static final String ME0013 = "Video has not existed";
 
+    static final String ME0014 = "Unknown given file extension";
+
     static final String MF0001 = "Error occur when creating new user ";
 
     static final String MF0002 = "Error occur when delete user ";

@@ -1,8 +1,8 @@
 package dev9.lapco.service.impl;
 
+import dev9.lapco.constant.Constants;
 import dev9.lapco.constant.Message;
 import dev9.lapco.constant.StatusCode;
-import dev9.lapco.entity.AccountEntity;
 import dev9.lapco.entity.VideoEntity;
 import dev9.lapco.repository.VideoRepository;
 import dev9.lapco.request.VideoRequest;
@@ -11,6 +11,8 @@ import dev9.lapco.service.VideoService;
 import dev9.lapco.util.ValidateUtil;
 import dev9.lapco.util.fileUtil.FileUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +23,8 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class VideoServiceImpl implements VideoService, Message, StatusCode {
+@Slf4j
+public class VideoServiceImpl implements VideoService, Message, StatusCode, Constants {
 
     private final FileUtil fileUtil;
 
@@ -29,67 +32,72 @@ public class VideoServiceImpl implements VideoService, Message, StatusCode {
 
     @Override
     public VideoResponse getAllVideo() {
-       if(ValidateUtil.isValidAuthority()){
-           return VideoResponse.builder().status(UNAUTHORIZED).message(ME0001).errorCode(true).videos(new ArrayList<>()).build();
+        if (ValidateUtil.isValidAuthority()) {
+            return VideoResponse.builder().status(UNAUTHORIZED).message(ME0001).errorCode(true).videos(new ArrayList<>()).build();
         }
-       //TODO : not had paginator yet
-       return VideoResponse.builder().status(SUCCESS).message(MI0006).errorCode(false).videos(videoRepository.findAll()).build();
+        //TODO : not had paginator yet
+        return VideoResponse.builder().status(SUCCESS).message(MI0006).errorCode(false).videos(videoRepository.findAll()).build();
     }
 
     @Override
     public VideoResponse addVideo(MultipartFile file, String videoName) {
-        if(ValidateUtil.isValidAuthority()){
+        if (ValidateUtil.isValidAuthority()) {
             return VideoResponse.builder().status(UNAUTHORIZED).message(ME0001).errorCode(true).videos(new ArrayList<>()).build();
         }
 
-        if(videoRepository.exists(Example.of(VideoEntity.builder().videoName(videoName).build()))){
+        String absoluteFileName = fileUtil.getAbsoluteFileName(file, videoName);
+
+        if (Strings.isBlank(absoluteFileName) || videoRepository.exists(Example.of(VideoEntity.builder().videoName(absoluteFileName).build()))) {
             return VideoResponse.builder().status(BAD_REQUEST).message(ME0012).errorCode(true).videos(new ArrayList<>()).build();
         }
 
-        if(file.isEmpty()){
+        if (file.isEmpty()) {
             return VideoResponse.builder().status(BAD_REQUEST).message(ME0011).errorCode(true).videos(new ArrayList<>()).build();
         }
-        try{
-            String duration = fileUtil.saveVideo(file, videoName).orElseThrow();
-            String path = fileUtil.getVideoPath(videoName).orElseThrow();
+        try {
+            String saveVideoInfo = fileUtil.saveVideo(file, videoName);
+            String[] videoInfo = saveVideoInfo.split(HYPHEN);
+            if (MF0003.equals(videoInfo[1])) {
+                return VideoResponse.builder().status(BAD_REQUEST).message(MF0003).errorCode(true).videos(new ArrayList<>()).build();
+            }
+
             return VideoResponse.builder()
                     .status(SUCCESS)
                     .message(MI0007)
                     .errorCode(false)
                     .videos(List.of(videoRepository.save(VideoEntity.builder()
-                            .videoName(videoName)
+                            .videoName(videoInfo[0])
                             .videoCode(null)
-                            .duration(duration)
-                            .path(path)
+                            .duration(videoInfo[1])
                             .build())))
                     .build();
-        }catch(Exception e){
+        } catch (Exception e) {
+            e.getStackTrace();
+            log.error(MF0004 + " - [" + e.getMessage() + "]");
             return VideoResponse.builder()
                     .status(BAD_REQUEST)
                     .message(MF0004)
-                    .errorCode(false)
+                    .errorCode(true)
                     .videos(new ArrayList<>())
                     .build();
         }
         // lack video code generate logic
-
-
     }
 
     @Override
     public VideoResponse deleteVideo(VideoRequest video) {
-        if(ValidateUtil.isValidAuthority()){
+        if (ValidateUtil.isValidAuthority()) {
             return VideoResponse.builder().status(UNAUTHORIZED).message(ME0001).errorCode(true).videos(new ArrayList<>()).build();
         }
 
-        Optional<VideoEntity> checkedVideoEntity =  videoRepository.findOne(Example.of(VideoEntity.builder()
+        Optional<VideoEntity> checkedVideoEntity = videoRepository.findOne(Example.of(VideoEntity.builder()
                 .videoName(video.getVideoName()).build()));
 
-        if(checkedVideoEntity.isEmpty()){
+        if (checkedVideoEntity.isEmpty()) {
             return VideoResponse.builder().status(BAD_REQUEST).message(ME0013).errorCode(true).videos(new ArrayList<>()).build();
         }
 
-        if(fileUtil.isDeleteVideo(video)){
+        if (fileUtil.isDeleteVideo(video.getVideoName())) {
             videoRepository.delete(checkedVideoEntity.get());
             return VideoResponse.builder()
                     .status(SUCCESS)

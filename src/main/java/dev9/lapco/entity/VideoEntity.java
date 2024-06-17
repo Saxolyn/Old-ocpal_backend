@@ -19,8 +19,6 @@ public class VideoEntity extends BaseEntity {
 
     private String videoCode;
 
-    private String path;
-
     private String duration;
 
 }

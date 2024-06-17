@@ -1,6 +1,7 @@
 package dev9.lapco.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import dev9.lapco.util.OcpalUtil;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -12,22 +13,17 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseResponse {
-    @JsonIgnore
+
     private String status;
 
-    @JsonIgnore
     private String message;
 
     @Builder.Default
-    @JsonIgnore
     private String timestamp = OcpalUtil.localDateTimeToString(LocalDateTime.now());
 
-    @JsonIgnore
-    private String path;
-
     @Builder.Default
-    @JsonIgnore
     private Boolean errorCode = false;
 
 }

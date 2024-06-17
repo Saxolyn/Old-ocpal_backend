@@ -11,4 +11,8 @@ public interface Constants {
     static String FILE_SLASH = File.separator + File.separator;
 
     static String PATH_SLASH = FILE_SLASH + FILE_SLASH;
+
+    static char DOT = '.';
+
+    static String HYPHEN = "-";
 }

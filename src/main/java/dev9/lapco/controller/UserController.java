@@ -31,4 +31,9 @@ public class UserController {
         return userService.deleteUser(deletedUserRequest);
     }
 
+    @PutMapping("/lock")
+    public BaseResponse lockAccount(@RequestParam String phoneNumber){
+        return userService.lock(phoneNumber);
+    }
+
 }

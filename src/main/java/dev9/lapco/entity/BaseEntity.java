@@ -36,7 +36,7 @@ public class BaseEntity {
     @LastModifiedDate
     private LocalDateTime updatedDate;
 
-    @Field(value = "isDelete")
+    @Field(value = "isDeleted")
     private Boolean isDeleted;
 
 }

@@ -21,13 +21,15 @@ public interface Message {
 
     static final String MI0008 = "Deleting video process successfully";
 
+    static final String MI0009 = "This given account has been locked successfully";
+
     static final String ME0001 = "Unauthorized error: {}";
 
     static final String ME0002 = "You are not authorized";
 
     static final String ME0003 = "Cannot find role of user with username/phone number:";
 
-    static final String ME0004 = "Account does not exist";
+    static final String ME0004 = "PhoneNumber or password is incorrect";
 
     static final String ME0005 = "username already exists";
 
@@ -35,7 +37,7 @@ public interface Message {
 
     static final String ME0007 = "User not found";
 
-    static final String ME0008 = "You cannot changed password ";
+    static final String ME0008 = "Account not found ";
 
     static final String ME0009 = "New Password invalid. Less 8 character with 01 uppercase, 01 special character, 01 number";
 
@@ -48,6 +50,12 @@ public interface Message {
     static final String ME0013 = "Video has not existed";
 
     static final String ME0014 = "Unknown given file extension";
+
+    static final String ME0015 = "You cannot lock this account";
+
+    static final String ME0016 = "Your account is locked";
+
+    static final String ME0017 = "Unable to restore password";
 
     static final String MF0001 = "Error occur when creating new user ";
 

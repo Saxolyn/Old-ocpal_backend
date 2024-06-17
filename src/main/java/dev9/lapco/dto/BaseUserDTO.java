@@ -18,4 +18,8 @@ public class BaseUserDTO implements Serializable {
     private String username;
 
     private ERole role;
+
+    private Boolean isDeleted;
+
+    private Boolean isLocked;
 }

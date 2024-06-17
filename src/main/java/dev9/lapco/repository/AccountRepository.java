@@ -12,13 +12,15 @@ import java.util.Optional;
 @Repository
 public interface AccountRepository extends MongoRepository<AccountEntity, String> {
 
-    @Query(value = "{'phone_number' : ?0,'isDelete': false}")
+    @Query(value = "{'phone_number' : ?0,'isDeleted': false}")
     Optional<AccountEntity>  findAccount (String phoneNumber);
 
-    @Query(value = "{'isDelete': false}")
+    @Query(value = "{'isDeleted': false}")
     List<AccountEntity> findAllAccount ();
 
     @Query("{ 'phone_number' : ?0 }")
-    @Update("{ '$set' : { 'isDelete' : true } }")
+    @Update("{ '$set' : { 'isDeleted' : true } }")
     void softDelete(String phoneNumber);
+
+    Optional<AccountEntity> findAccountByPhoneNumberAndIsLocked(String phoneNumber, Boolean isLock);
 }

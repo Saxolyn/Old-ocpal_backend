@@ -1,5 +1,6 @@
 package dev9.lapco.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -9,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccountType extends BaseEntity {
 
     private String username;
@@ -37,7 +39,5 @@ public class AccountType extends BaseEntity {
     private String image;
 
     private String userCode;
-
-    private boolean isLock;
 
 }

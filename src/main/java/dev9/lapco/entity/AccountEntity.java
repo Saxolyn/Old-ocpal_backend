@@ -2,12 +2,8 @@ package dev9.lapco.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev9.lapco.constant.ERole;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -28,5 +24,9 @@ public class AccountEntity extends BaseEntity {
     private String password;
 
     private ERole role;
+
+    @Builder.Default
+    @Field(value = "isLocked")
+    private Boolean isLocked = false;
 
 }

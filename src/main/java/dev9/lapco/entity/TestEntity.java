@@ -28,7 +28,7 @@ public class TestEntity extends BaseEntity {
 
     private long testTime;
 
-    private ClassEntity joinClass;
+    private ClassEntity joinedClass;
 
     private String testDescription;
 

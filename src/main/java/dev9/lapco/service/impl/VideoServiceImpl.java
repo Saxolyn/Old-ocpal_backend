@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static dev9.lapco.util.ValidateUtil.isValidAuthority;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -32,7 +34,7 @@ public class VideoServiceImpl implements VideoService, Message, StatusCode, Cons
 
     @Override
     public VideoResponse getAllVideo() {
-        if (ValidateUtil.isValidAuthority()) {
+        if (isValidAuthority()) {
             return VideoResponse.builder().status(UNAUTHORIZED).message(ME0001).errorCode(true).videos(new ArrayList<>()).build();
         }
         //TODO : not had paginator yet
@@ -41,7 +43,7 @@ public class VideoServiceImpl implements VideoService, Message, StatusCode, Cons
 
     @Override
     public VideoResponse addVideo(MultipartFile file, String videoName) {
-        if (ValidateUtil.isValidAuthority()) {
+        if (isValidAuthority()) {
             return VideoResponse.builder().status(UNAUTHORIZED).message(ME0001).errorCode(true).videos(new ArrayList<>()).build();
         }
 
@@ -86,7 +88,7 @@ public class VideoServiceImpl implements VideoService, Message, StatusCode, Cons
 
     @Override
     public VideoResponse deleteVideo(VideoRequest video) {
-        if (ValidateUtil.isValidAuthority()) {
+        if (isValidAuthority()) {
             return VideoResponse.builder().status(UNAUTHORIZED).message(ME0001).errorCode(true).videos(new ArrayList<>()).build();
         }
 

@@ -12,4 +12,6 @@ public interface UserService {
     GetUserResponse getUserList();
 
     BaseResponse deleteUser(DeletedUserRequest deletedUserRequest);
+
+    BaseResponse lock(String phoneNumber);
 }

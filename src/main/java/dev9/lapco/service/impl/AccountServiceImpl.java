@@ -1,5 +1,6 @@
 package dev9.lapco.service.impl;
 
+import dev9.lapco.constant.ERole;
 import dev9.lapco.util.ValidateUtil;
 import dev9.lapco.config.jwt.JwtUtils;
 import dev9.lapco.config.security.UserDetailsImpl;
@@ -49,7 +50,10 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-                        String jwtToken = jwtUtils.generateToken(userDetails);
+            String jwtToken = jwtUtils.generateToken(userDetails);
+            if ((userDetails.getRole().equals(ERole.ADMIN) || userDetails.getRole().equals(ERole.TEACHER)) && accountRepository.findAccountByPhoneNumberAndIsLocked(userDetails.getPhoneNumber(),true).isPresent()) {
+                return LoginResponse.builder().status(UNAUTHORIZED).message(ME0016).errorCode(true).build();
+            }
 
             return LoginResponse.builder()
                     .status(SUCCESS)
@@ -77,9 +81,8 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
                 return BaseResponse.builder().status(SUCCESS).message(MI0002).build();
             case TEACHER:
             case STUDENT:
-                return BaseResponse.builder().status(SUCCESS).message(ME0009).build();
             default:
-                return BaseResponse.builder().status(BAD_REQUEST).message(ME0009).build();
+                return BaseResponse.builder().status(BAD_REQUEST).message(ME0017).build();
         }
 
 
@@ -90,11 +93,11 @@ public class AccountServiceImpl implements AccountService, StatusCode, Message {
         UserDetailsImpl loggedUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Optional<AccountEntity> account = accountRepository.findAccount(loggedUser.getPhoneNumber());
-        if(account.isEmpty()) {
+        if (account.isEmpty()) {
             return BaseResponse.builder().status(NOT_FOUND).message(ME0002).build();
         }
 
-        if(!ValidateUtil.isValidPassword(request.getOldPassword(),request.getNewPassword(), request.getConfirmPassword())){
+        if (!ValidateUtil.isValidPassword(request.getOldPassword(), request.getNewPassword(), request.getConfirmPassword())) {
             return BaseResponse.builder().status(BAD_REQUEST).message(ME0009).build();
         }
         account.get().setPassword(passwordEncoder.encode(request.getNewPassword()));

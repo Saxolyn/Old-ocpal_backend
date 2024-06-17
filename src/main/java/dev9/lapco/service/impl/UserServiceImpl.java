@@ -1,8 +1,7 @@
 package dev9.lapco.service.impl;
 
-import dev9.lapco.util.ConvertedUtil;
-import dev9.lapco.util.ValidateUtil;
 import dev9.lapco.config.security.UserDetailsImpl;
+import dev9.lapco.constant.Constants;
 import dev9.lapco.constant.ERole;
 import dev9.lapco.constant.Message;
 import dev9.lapco.constant.StatusCode;
@@ -21,7 +20,10 @@ import dev9.lapco.response.BaseResponse;
 import dev9.lapco.response.CreatedUserResponse;
 import dev9.lapco.response.GetUserResponse;
 import dev9.lapco.service.UserService;
+import dev9.lapco.util.ConvertedUtil;
+import dev9.lapco.util.ValidateUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,9 +32,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static dev9.lapco.util.ValidateUtil.isValidAuthority;
+
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService, StatusCode, Message {
+public class UserServiceImpl implements UserService, StatusCode, Message, Constants {
 
     private final StudentRepository studentRepository;
 
@@ -63,8 +67,8 @@ public class UserServiceImpl implements UserService, StatusCode, Message {
             try {
                 switch (currentUser.getRole()) {
                     case SUPER_ADMIN:
-                        switch (createdUserRequest.getRole()){
-                             case ADMIN:
+                        switch (createdUserRequest.getRole()) {
+                            case ADMIN:
                                 AdminEntity newAdmin = (AdminEntity) convertedUtil.convertNewUserRequestToStudentEntity(createdUserRequest);
                                 adminRepository.save(newAdmin);
                                 break;
@@ -81,7 +85,7 @@ public class UserServiceImpl implements UserService, StatusCode, Message {
                                 return CreatedUserResponse.builder().status(BAD_REQUEST).message(ME0002).errorCode(true).build();
                         }
                     case ADMIN:
-                        switch (createdUserRequest.getRole()){
+                        switch (createdUserRequest.getRole()) {
                             case TEACHER:
                                 TeacherEntity newTeacher = (TeacherEntity) convertedUtil.convertNewUserRequestToStudentEntity(createdUserRequest);
                                 teacherRepository.save(newTeacher);
@@ -129,20 +133,26 @@ public class UserServiceImpl implements UserService, StatusCode, Message {
         //TODO : not had paginator yet
         switch (currentUser.getRole()) {
             case SUPER_ADMIN:
-                return GetUserResponse.builder().status(SUCCESS).message(MI0006).errorCode(false).baseUserDTOList(                        accountList.stream()
+                return GetUserResponse.builder().status(SUCCESS).message(MI0006).errorCode(false).baseUserDTOList(accountList.stream()
                         .filter(m -> (!m.getRole().equals(ERole.SUPER_ADMIN)))
                         .map(n -> BaseUserDTO.builder()
                                 .username(n.getUsername())
                                 .phoneNumber(n.getPhoneNumber())
-                                .role(n.getRole()).build())
+                                .role(n.getRole())
+                                .isLocked(n.getIsLocked())
+                                .isDeleted(n.getIsDeleted())
+                                .build())
                         .collect(Collectors.toList())).build();
             case ADMIN:
-                return GetUserResponse.builder().status(SUCCESS).message(MI0006).errorCode(false).baseUserDTOList(                        accountList.stream()
+                return GetUserResponse.builder().status(SUCCESS).message(MI0006).errorCode(false).baseUserDTOList(accountList.stream()
                         .filter(m -> (m.getRole().equals(ERole.STUDENT) || m.getRole().equals(ERole.TEACHER)))
                         .map(n -> BaseUserDTO.builder()
                                 .username(n.getUsername())
                                 .phoneNumber(n.getPhoneNumber())
-                                .role(n.getRole()).build())
+                                .role(n.getRole())
+                                .isLocked(n.getIsLocked())
+                                .isDeleted(n.getIsDeleted())
+                                .build())
                         .collect(Collectors.toList())).build();
             case TEACHER:
                 return GetUserResponse.builder().status(SUCCESS).message(MI0006).errorCode(false).baseUserDTOList(
@@ -151,7 +161,10 @@ public class UserServiceImpl implements UserService, StatusCode, Message {
                                 .map(n -> BaseUserDTO.builder()
                                         .username(n.getUsername())
                                         .phoneNumber(n.getPhoneNumber())
-                                        .role(n.getRole()).build())
+                                        .role(n.getRole())
+                                        .isLocked(n.getIsLocked())
+                                        .isDeleted(n.getIsDeleted())
+                                        .build())
                                 .collect(Collectors.toList())
                 ).build();
             default:
@@ -187,6 +200,64 @@ public class UserServiceImpl implements UserService, StatusCode, Message {
         } catch (Exception e) {
             return BaseResponse.builder().status(BAD_REQUEST).message(MF0002).errorCode(true).build();
         }
+
+    }
+
+    @Override
+    public BaseResponse lock(String phoneNumber) {
+        if (isValidAuthority()) {
+            return BaseResponse.builder().status(UNAUTHORIZED).message(ME0002).errorCode(true).build();
+        }
+
+        UserDetailsImpl currentUser = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<AccountEntity> account = accountRepository.findAccount(phoneNumber);
+        if (account.isEmpty()) {
+            return BaseResponse.builder().status(BAD_REQUEST).message(ME0008).errorCode(true).build();
+        }
+
+        switch (currentUser.getRole()) {
+            case SUPER_ADMIN:
+                switch (account.get().getRole()) {
+                    case ADMIN:
+                        Optional<AdminEntity> admin = adminRepository.findOne(Example.of(AdminEntity.builder().phoneNumber(phoneNumber).build()));
+                        if (admin.isEmpty()) {
+                            return BaseResponse.builder().status(BAD_REQUEST).message(ME0015).errorCode(true).build();
+                        }
+                        admin.get().setLock(true);
+                        adminRepository.save(admin.get());
+                        break;
+                    case TEACHER:
+                        Optional<TeacherEntity> teacher = teacherRepository.findOne(Example.of(TeacherEntity.builder().phoneNumber(phoneNumber).build()));
+                        if (teacher.isEmpty()) {
+                            return BaseResponse.builder().status(BAD_REQUEST).message(ME0015).errorCode(true).build();
+                        }
+                        teacher.get().setLock(true);
+                        teacherRepository.save(teacher.get());
+                        break;
+                    default:
+                        return BaseResponse.builder().status(BAD_REQUEST).message(ME0015).errorCode(true).build();
+                }
+                break;
+            case ADMIN:
+                Optional<TeacherEntity> teacher = teacherRepository.findOne(Example.of(TeacherEntity.builder().phoneNumber(phoneNumber).build()));
+                if (teacher.isEmpty()) {
+                    return BaseResponse.builder().status(BAD_REQUEST).message(ME0015).errorCode(true).build();
+
+                }
+                teacher.get().setLock(true);
+                teacherRepository.save(teacher.get());
+                break;
+            case TEACHER:
+            case STUDENT:
+            default:
+                return BaseResponse.builder().status(BAD_REQUEST).message(ME0015).errorCode(true).build();
+
+        }
+        account.get().setIsLocked(true);
+        accountRepository.save(account.get());
+        return BaseResponse.builder().status(SUCCESS).message(MI0009).errorCode(false).build();
+
 
     }
 

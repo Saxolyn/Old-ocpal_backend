@@ -14,4 +14,6 @@ public class AdminEntity extends AccountType{
 
     private String password;
 
+    private boolean isLock;
+
 }
